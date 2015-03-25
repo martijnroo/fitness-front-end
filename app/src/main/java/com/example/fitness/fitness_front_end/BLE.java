@@ -57,4 +57,6 @@ public class BLE extends Service {
         bGatt.close();
         bGatt = null;
     }
+
+
 }
