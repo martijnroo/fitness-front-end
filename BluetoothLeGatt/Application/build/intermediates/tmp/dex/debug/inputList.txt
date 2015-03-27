@@ -1,0 +1,7 @@
+/home/shangxor/Android_dev/BluetoothLeGatt/Application/build/intermediates/classes/debug
+/home/shangxor/Android_dev/BluetoothLeGatt/Application/build/intermediates/pre-dexed/debug/internal_impl-21.0.2-eca6d775963881ba641cc4cca506e66071411e57.jar
+/home/shangxor/Android_dev/BluetoothLeGatt/Application/build/intermediates/pre-dexed/debug/support-annotations-21.0.2-1a5fbd6d5843c690d5841c8e519aa63aa8a57700.jar
+/home/shangxor/Android_dev/BluetoothLeGatt/Application/build/intermediates/pre-dexed/debug/classes-50b94e71865e41ec435ef35f8ad2f579287ab9d5.jar
+/home/shangxor/Android_dev/BluetoothLeGatt/Application/build/intermediates/pre-dexed/debug/classes-21a92381768f692cfdefd05ea5f1fd750a416c4e.jar
+/home/shangxor/Android_dev/BluetoothLeGatt/Application/build/intermediates/pre-dexed/debug/internal_impl-21.0.2-7ec7d5f02dd6cc75ce08e139266d9f8fa51113b2.jar
+/home/shangxor/Android_dev/BluetoothLeGatt/Application/build/intermediates/pre-dexed/debug/classes-0e2bc7f7e76012d111600c68846e99afb4387726.jar
