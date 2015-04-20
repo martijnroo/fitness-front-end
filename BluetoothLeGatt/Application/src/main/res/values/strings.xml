@@ -33,4 +33,9 @@
     <string name="menu_disconnect">Disconnect</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_stop">Stop</string>
+    <string name="title_activity_graph">GraphActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="app_title">Welcome to the Fitness App!</string>
+    <string name="action_settings">Settings</string>
 </resources>
