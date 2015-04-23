@@ -126,7 +126,7 @@ public class BluetoothLeService extends Service {
         // This is special handling for the Heart Rate Measurement profile.  Data parsing is
         // carried out as per profile specifications:
         // http://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml
-        /**
+
          int flag = characteristic.getProperties();
          int format = -1;
          if ((flag & 0x01) != 0) {
@@ -139,7 +139,7 @@ public class BluetoothLeService extends Service {
          final int heartRate = characteristic.getIntValue(format, 1);
          Log.d(TAG, String.format("Received heart rate: %d", heartRate));
          intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
-         */
+        /**
         int flag = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
         int format = -1;
         int offset = 1;
@@ -154,14 +154,28 @@ public class BluetoothLeService extends Service {
         }
 
         if ((flag & 0x10) != 0){
-            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 1);
-            Log.d(TAG, String.format("Received RR interval: %d", rr_interval));
+            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2);
+            Log.d(TAG, String.format("Received RR interval 0: %d", rr_interval));
+
+            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 4);
+            Log.d(TAG, String.format("Received RR interval 1: %d", rr_interval));
+
+            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 6);
+            Log.d(TAG, String.format("Received RR interval 2: %d", rr_interval));
+
+            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 8);
+            Log.d(TAG, String.format("Received RR interval 3: %d", rr_interval));
+
+            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 10);
+            Log.d(TAG, String.format("Received RR interval 4: %d", rr_interval));
+
+
         }
 
 
         intent.putExtra(EXTRA_DATA, String.valueOf(rr_interval));
 
-
+*/
         sendBroadcast(intent);
     }
 
