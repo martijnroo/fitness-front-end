@@ -30,9 +30,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.text.format.Time;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -47,6 +54,7 @@ public class BluetoothLeService extends Service {
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
+    private Map<String, ArrayList<Integer>> measurements = new HashMap<String, ArrayList<Integer>>();
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
@@ -126,7 +134,7 @@ public class BluetoothLeService extends Service {
         // This is special handling for the Heart Rate Measurement profile.  Data parsing is
         // carried out as per profile specifications:
         // http://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml
-
+        /**
          int flag = characteristic.getProperties();
          int format = -1;
          if ((flag & 0x01) != 0) {
@@ -139,21 +147,68 @@ public class BluetoothLeService extends Service {
          final int heartRate = characteristic.getIntValue(format, 1);
          Log.d(TAG, String.format("Received heart rate: %d", heartRate));
          intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
-        /**
+        */
         int flag = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
         int format = -1;
-        int offset = 1;
-        int rr_interval = 0;
+        Integer rr_interval;
+        rr_interval = 0;
+        Time time = new Time();
+        String time_stamp = null;
 
+        //ArrayList<Integer> intervals = new ArrayList<Integer>();
+        //Map<String, ArrayList<Integer>> measurements = new HashMap<String, ArrayList<Integer>>();
+
+        /**
         if ((flag & 0x01) != 0) {
             format = BluetoothGattCharacteristic.FORMAT_UINT16;
-            Log.d(TAG, "Heart rate format UINT16.");
+           // Log.d(TAG, "Heart rate format UINT16.");
         } else {
             format = BluetoothGattCharacteristic.FORMAT_UINT8;
-            Log.d(TAG, "Heart rate format UINT8.");
+           // Log.d(TAG, "Heart rate format UINT8.");
         }
+        */
 
         if ((flag & 0x10) != 0){
+            format = BluetoothGattCharacteristic.FORMAT_UINT16;
+
+            for(int i=2; i<=10; i+=2){
+                rr_interval = characteristic.getIntValue(format,i);
+
+                time.setToNow();
+                time_stamp = time.toString();
+
+                //if(rr_interval != null) Log.d(TAG, String.format("RR interval[%d]: %d at time: %s", i, rr_interval, time_stamp));
+
+                if (rr_interval != null) {
+                    intent.putExtra(EXTRA_DATA, rr_interval.toString());
+                }
+
+                if(!measurements.containsKey(time_stamp)){
+                    measurements.put(time_stamp, new ArrayList<Integer>());
+                    if(rr_interval != null) measurements.get(time_stamp).add(rr_interval);
+                }
+                else{
+                    if(rr_interval != null) measurements.get(time_stamp).add(rr_interval);
+                }
+
+                sendBroadcast(intent);
+            }
+/**
+            Set keys = measurements.keySet();
+            Iterator i;
+
+            for(i = keys.iterator(); i.hasNext();){
+                String key = (String) i.next();
+                //Log.d(TAG, String.format("Measurement %s has values:", key));
+                intervals = measurements.get(key);
+                for(int j=0; j < intervals.size();j++){
+                   // Log.d(TAG, String.format("%d", intervals.get(j)));
+                }
+            }
+
+*/
+
+            /**
             rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2);
             Log.d(TAG, String.format("Received RR interval 0: %d", rr_interval));
 
@@ -168,15 +223,16 @@ public class BluetoothLeService extends Service {
 
             rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 10);
             Log.d(TAG, String.format("Received RR interval 4: %d", rr_interval));
-
+*/
 
         }
 
-
-        intent.putExtra(EXTRA_DATA, String.valueOf(rr_interval));
-
-*/
-        sendBroadcast(intent);
+        JSONObject json = new JSONObject(measurements);
+        try {
+            Log.d(TAG, String.format("Measurements: %s", json.toString(1)));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public class LocalBinder extends Binder {
