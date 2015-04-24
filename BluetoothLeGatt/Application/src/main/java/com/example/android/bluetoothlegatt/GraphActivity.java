@@ -36,7 +36,7 @@ public class GraphActivity extends Activity {
         setContentView(R.layout.activity_graph);
 
 
-
+        NetworkManager.getInstance().getMeasurements();
         //makeRequest();
     }
 
@@ -56,7 +56,7 @@ public class GraphActivity extends Activity {
 
                                 double[] hr = new double[msr.length()];
                                 Date[] dates = new Date[msr.length()];
-                                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+                                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
                                 for (int i = 0; i < msr.length(); i++) {
 
@@ -74,6 +74,8 @@ public class GraphActivity extends Activity {
                                         getFragmentManager().findFragmentById(R.id.graph_fragment);
 
                                 gf.setGraphData(graphData);
+                                System.out.println("Received hbeats: "+hr);
+                                System.out.println("Received timestamps: "+dates);
 
 //                                GraphView graph = (GraphView) findViewById(R.id.graph);
 //

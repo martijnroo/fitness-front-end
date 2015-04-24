@@ -10,10 +10,12 @@ import android.view.ViewGroup;
 
 import com.android.volley.RequestQueue;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -42,6 +44,7 @@ public class GraphFragment extends Fragment {
     public void setGraphData(HashMap<String,Object> data) {
 
         double[] msr = (double[])data.get("measurements");
+        Date[] dates = (Date[])data.get("timestamps");
 
         double min = msr[0];
         double max = min;
@@ -55,7 +58,7 @@ public class GraphFragment extends Fragment {
             if (msr[i] > max)
                 max = msr[i];
 
-            dp[i] = new DataPoint(i, msr[i]);
+            dp[i] = new DataPoint(dates[i], msr[i]);
         }
 
         mSeries.resetData(dp);
@@ -73,8 +76,15 @@ public class GraphFragment extends Fragment {
         graph.getViewport().setMinY(min);
         graph.getViewport().setMaxY(max);
 
-        graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(msr.length-1);
+        // set date label formatter
+        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
+        graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
+
+// set manual x bounds to have nice steps
+        graph.getViewport().setMinX(dates[0].getTime());
+        graph.getViewport().setMaxX(dates[dates.length - 1].getTime());
+
+        System.out.println("New data set!");
     }
 
     /**
