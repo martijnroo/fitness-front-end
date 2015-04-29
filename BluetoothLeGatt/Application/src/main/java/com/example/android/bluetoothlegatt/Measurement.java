@@ -7,8 +7,8 @@ import java.util.Date;
  */
 public class Measurement {
 
-    public int heart_rate;
+    public int rr_value;
     public int id;
-    public String timestamp;
+    public Date timestamp;
     public int user_id;
 }

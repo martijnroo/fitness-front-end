@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.Console;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -36,99 +37,107 @@ public class GraphActivity extends Activity {
         setContentView(R.layout.activity_graph);
 
 
-        NetworkManager.getInstance().getMeasurements();
-        //makeRequest();
+        //NetworkManager.getInstance().getMeasurements(null);
+
+        Measurement m1 = new Measurement();
+        m1.user_id = 9;
+        m1.rr_value = 505;
+
+        ArrayList<Measurement> msr = new ArrayList<>();
+        msr.add(m1);
+
+        NetworkManager.getInstance().sendMeasurementsData(msr);
     }
 
-    public void makeRequest() {
-        mRequestQueue =  Volley.newRequestQueue(this);
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-
-                            System.out.println("Response: " + response.toString());
-                            JSONArray msr = response.getJSONArray("measurements");
-
-                            if (msr.length() >0 ) {
-
-                                double[] hr = new double[msr.length()];
-                                Date[] dates = new Date[msr.length()];
-                                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-
-                                for (int i = 0; i < msr.length(); i++) {
-
-                                    hr[i] = (double) (msr.getJSONObject(i).getInt("heart_rate"));
-                                    String curDate = (String) (msr.getJSONObject(i).getString("timestamp"));
-                                    dates[i] = formatter.parse(curDate);
-
-                                }
-
-                                HashMap<String, Object> graphData = new HashMap<>();
-                                graphData.put("measurements",hr);
-                                graphData.put("timestamps", dates);
-
-                                GraphFragment gf = (GraphFragment)
-                                        getFragmentManager().findFragmentById(R.id.graph_fragment);
-
-                                gf.setGraphData(graphData);
-                                System.out.println("Received hbeats: "+hr);
-                                System.out.println("Received timestamps: "+dates);
-
-//                                GraphView graph = (GraphView) findViewById(R.id.graph);
+//    public void makeRequest() {
+//        mRequestQueue =  Volley.newRequestQueue(this);
+//        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+//                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 //
-//                                double min = (double)(msr.getJSONObject(0).getInt("heart_rate"));
-//                                double max = min;
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
 //
-//                                DataPoint[] dp = new DataPoint[msr.length()];
+//                            System.out.println("Response: " + response.toString());
+//                            JSONArray msr = response.getJSONArray("measurements");
+//
+//                            if (msr.length() >0 ) {
+//
+//                                double[] hr = new double[msr.length()];
+//                                Date[] dates = new Date[msr.length()];
+//                                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+//
 //                                for (int i = 0; i < msr.length(); i++) {
-//                                    double val = (double)(msr.getJSONObject(i).getInt("heart_rate"));
 //
-//                                    if (val < min)
-//                                        min = val;
+//                                    hr[i] = (double) (msr.getJSONObject(i).getInt("heart_rate"));
+//                                    String curDate = (String) (msr.getJSONObject(i).getString("timestamp"));
+//                                    dates[i] = formatter.parse(curDate);
 //
-//                                    if (val > max)
-//                                        max = val;
-//
-//                                    dp[i] = new DataPoint(i, val);
-//                                    System.out.println("Point:" +val);
 //                                }
 //
-//                                mSeries.resetData(dp);
-//                                System.out.println("New Data Loaded on the Graph!");
+//                                HashMap<String, Object> graphData = new HashMap<>();
+//                                graphData.put("measurements",hr);
+//                                graphData.put("timestamps", dates);
 //
-//                                graph.getViewport().setYAxisBoundsManual(true);
-//                                graph.getViewport().setXAxisBoundsManual(true);
+//                                GraphFragment gf = (GraphFragment)
+//                                        getFragmentManager().findFragmentById(R.id.graph_fragment);
 //
-//                                if (min == max) {
-//                                    min -= 2;
-//                                    max += 2;
-//                                }
-//                                graph.getViewport().setMinY(min);
-//                                graph.getViewport().setMaxY(max);
+//                                gf.setGraphData(graphData);
+//                                System.out.println("Received hbeats: "+hr);
+//                                System.out.println("Received timestamps: "+dates);
 //
-//                                graph.getViewport().setMinX(0);
-//                                graph.getViewport().setMaxX(msr.length()-1);
-                            }
-
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
-                        System.out.println(error);
-
-                    }
-                });
-
-        mRequestQueue.add(jsObjRequest);
-    }
+////                                GraphView graph = (GraphView) findViewById(R.id.graph);
+////
+////                                double min = (double)(msr.getJSONObject(0).getInt("heart_rate"));
+////                                double max = min;
+////
+////                                DataPoint[] dp = new DataPoint[msr.length()];
+////                                for (int i = 0; i < msr.length(); i++) {
+////                                    double val = (double)(msr.getJSONObject(i).getInt("heart_rate"));
+////
+////                                    if (val < min)
+////                                        min = val;
+////
+////                                    if (val > max)
+////                                        max = val;
+////
+////                                    dp[i] = new DataPoint(i, val);
+////                                    System.out.println("Point:" +val);
+////                                }
+////
+////                                mSeries.resetData(dp);
+////                                System.out.println("New Data Loaded on the Graph!");
+////
+////                                graph.getViewport().setYAxisBoundsManual(true);
+////                                graph.getViewport().setXAxisBoundsManual(true);
+////
+////                                if (min == max) {
+////                                    min -= 2;
+////                                    max += 2;
+////                                }
+////                                graph.getViewport().setMinY(min);
+////                                graph.getViewport().setMaxY(max);
+////
+////                                graph.getViewport().setMinX(0);
+////                                graph.getViewport().setMaxX(msr.length()-1);
+//                            }
+//
+//                        } catch (Exception e) {
+//                            System.out.println(e.getMessage());
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        // TODO Auto-generated method stub
+//                        System.out.println(error);
+//
+//                    }
+//                });
+//
+//        mRequestQueue.add(jsObjRequest);
+//    }
 
 
     @Override
