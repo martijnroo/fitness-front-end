@@ -3,6 +3,7 @@ package com.example.android.bluetoothlegatt;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,5 +25,5 @@ public interface MeasurementsAPI {
     public void measurements(@QueryMap Map<String, String> options, Callback<JsonElement> cb);
 
     @POST("/measurements/")
-    public void pushMeasurements(@Body String measurements, Callback<Response> cb);
+    public void pushMeasurements(@Body HashMap<String,List<Measurement>> measurements, Callback<Response> cb);
 }

@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 
-public class GraphActivity extends Activity {
+public class GraphActivity extends Activity implements NetworkManagerListener {
 
     private LineGraphSeries<DataPoint> mSeries;
     private RequestQueue mRequestQueue;
@@ -36,18 +36,71 @@ public class GraphActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
+        // ADD NETWORK MANAGER LISTENER TO RECEIVE CALLBACKS
 
-        //NetworkManager.getInstance().getMeasurements(null);
+        NetworkManager.getInstance().addNetworkListener(this);
 
+        //----------------------------------------------------
+        // EXAMPLE OF SENDING DATA
+        // CREATE MEASUREMENT, >=1
         Measurement m1 = new Measurement();
         m1.user_id = 9;
-        m1.rr_value = 505;
+        m1.rr_value = 585;
 
+        // ADD MEASUREMENTS TO ARRAYLIST
         ArrayList<Measurement> msr = new ArrayList<>();
         msr.add(m1);
 
+        // USE NETWORK MANAGER API TO SEND
         NetworkManager.getInstance().sendMeasurementsData(msr);
+
+        //----------------------------------------------------
+        // EXAMPLE OF GETTING DATA
+        // CREATE HASHMAP WITH QUERY ARGS
+        HashMap<String, String> query = new HashMap<>();
+        query.put("user_id","9");
+
+        // USE NETWORK MANAGET TO GET THE DATA
+        // THEN USE CALLBACK BELOW
+
+        NetworkManager.getInstance().getMeasurements(query);
     }
+
+    public void measurementDataReceived(MeasurementData data){
+        // CALLBACK FROM NETWORK MANAGER WHEN DATA IS RECEIVED
+        // TO ACCESS the data use data.measurements() property
+        System.out.println("RECEIVED CALLBACK FIRE, data=" + data.measurements());
+    }
+    public void measurementDataSent(){
+        // CALLBACK FROM NETWORK MANAGER WHEN DATA IS SENT
+        System.out.println("SEND CALLBACK FIRE");
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_graph, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+}
+
+
 
 //    public void makeRequest() {
 //        mRequestQueue =  Volley.newRequestQueue(this);
@@ -138,27 +191,3 @@ public class GraphActivity extends Activity {
 //
 //        mRequestQueue.add(jsObjRequest);
 //    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_graph, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-}

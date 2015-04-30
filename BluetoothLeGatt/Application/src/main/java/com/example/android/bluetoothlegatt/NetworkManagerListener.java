@@ -6,4 +6,5 @@ package com.example.android.bluetoothlegatt;
 public interface NetworkManagerListener {
 
     public void measurementDataReceived(MeasurementData data);
+    public void measurementDataSent();
 }

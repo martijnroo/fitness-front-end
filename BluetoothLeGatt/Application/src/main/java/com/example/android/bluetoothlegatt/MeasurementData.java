@@ -7,24 +7,19 @@ import java.util.EventObject;
  */
 public class MeasurementData extends EventObject {
 
-    private double[] _heartBeats;
-    private String[] _timestamps;
+    private Measurement[] _measurements;
 
-    public MeasurementData( Object source, double[] heartBeats, String[] timestamps ) {
+    public MeasurementData( Object source, Measurement[] measurements ) {
         super( source );
-        _heartBeats = heartBeats;
-        _timestamps = timestamps;
+        _measurements = measurements;
     }
 
     public MeasurementData( Object source ) {
         super( source );
     }
 
-    public double[] heartBeats() {
-        return _heartBeats;
+    public Measurement[] measurements() {
+        return _measurements;
     }
 
-    public String[] timestamps() {
-        return _timestamps;
-    }
 }
