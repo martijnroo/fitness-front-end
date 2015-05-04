@@ -24,6 +24,8 @@ import java.util.List;
 
 public class MainActivity extends Activity {
 
+    private List<String> your_array_list;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,22 +56,9 @@ public class MainActivity extends Activity {
 
         MainListener listener = new MainListener();
         NetworkManager.getInstance().addNetworkListener(listener);
+        NetworkManager.getInstance().getExercises(query);
 
-        // TODO: Roman, fetch the exercises and update the ArrayAdapter below with the content in the callback!
-        NetworkManager.getInstance().getMeasurements(query);
-
-        // A dummy list
-        List<String> your_array_list = new ArrayList<String>();
-        your_array_list.add("Exercise 0");
-        your_array_list.add("Exercise 1");
-        your_array_list.add("Exercise 2");
-        your_array_list.add("Exercise 3");
-        your_array_list.add("Exercise 4");
-        your_array_list.add("Exercise 5");
-        your_array_list.add("Exercise 6");
-        your_array_list.add("Exercise 7");
-        your_array_list.add("Exercise 8");
-
+        your_array_list = new ArrayList<String>();
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
@@ -101,8 +90,7 @@ public class MainActivity extends Activity {
     public class MainListener implements NetworkManagerListener {
         @Override
         public void measurementDataReceived(MeasurementData data){
-            // TODO: update the exercise list form the data fetched from the server
-            // (arrayAdapter)
+
             Log.v("CALLBACK:", "DATA RECEIVED!");
             for (Measurement m : data.measurements()) {
                 //Log.v("FROM THE SERVER: ", String.valueOf(m.rr_value));
@@ -113,6 +101,19 @@ public class MainActivity extends Activity {
         public void measurementDataSent() {
             Log.d("CALLBACK:", "DATA SENT!");
         }
+
+        public void exerciseDataReceived(ExerciseData data){
+
+            int i=0;
+            for (Exercise ex : data.exercises()) {
+
+                your_array_list.add("Exercise "+i);
+                i++;
+
+            }
+
+        }
+        public void exerciseDataSent(){ Log.d("CALLBACK:", "DATA SENT!"); }
     }
 
 

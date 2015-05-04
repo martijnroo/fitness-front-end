@@ -40,30 +40,46 @@ public class GraphActivity extends Activity implements NetworkManagerListener {
 
         NetworkManager.getInstance().addNetworkListener(this);
 
-        //----------------------------------------------------
-        // EXAMPLE OF SENDING DATA
-        // CREATE MEASUREMENT, >=1
-        Measurement m1 = new Measurement();
-        m1.user_id = 9;
-        m1.rr_value = 585;
+//        //----------------------------------------------------
+//        // EXAMPLE OF SENDING DATA
+//        // CREATE MEASUREMENT, >=1
+//        Measurement m1 = new Measurement();
+//        m1.user_id = 9;
+//        m1.rr_value = 585;
+//
+//        // ADD MEASUREMENTS TO ARRAYLIST
+//        ArrayList<Measurement> msr = new ArrayList<>();
+//        msr.add(m1);
+//
+//        // USE NETWORK MANAGER API TO SEND
+//        NetworkManager.getInstance().sendMeasurementsData(msr);
+//
+//        //----------------------------------------------------
+//        // EXAMPLE OF GETTING DATA
+//        // CREATE HASHMAP WITH QUERY ARGS
+//        HashMap<String, String> query = new HashMap<>();
+//        query.put("user_id","9");
+//
+//        // USE NETWORK MANAGET TO GET THE DATA
+//        // THEN USE CALLBACK BELOW
+//
+//        NetworkManager.getInstance().getMeasurements(query);
+//
+//        Exercise e1 = new Exercise();
+//        e1.type = "walking";
+//        e1.user_id = 9;
+//        e1.start = new Date();
+//        e1.end = new Date();
+//
+//        ArrayList<Exercise> exr = new ArrayList<>();
+//        exr.add(e1);
+//
+//        NetworkManager.getInstance().sendExercisesData(exr);
 
-        // ADD MEASUREMENTS TO ARRAYLIST
-        ArrayList<Measurement> msr = new ArrayList<>();
-        msr.add(m1);
+        HashMap<String, String> exr_query = new HashMap<>();
+        exr_query.put("user_id","4");
 
-        // USE NETWORK MANAGER API TO SEND
-        NetworkManager.getInstance().sendMeasurementsData(msr);
-
-        //----------------------------------------------------
-        // EXAMPLE OF GETTING DATA
-        // CREATE HASHMAP WITH QUERY ARGS
-        HashMap<String, String> query = new HashMap<>();
-        query.put("user_id","9");
-
-        // USE NETWORK MANAGET TO GET THE DATA
-        // THEN USE CALLBACK BELOW
-
-        NetworkManager.getInstance().getMeasurements(query);
+        NetworkManager.getInstance().getExercises(exr_query);
     }
 
     public void measurementDataReceived(MeasurementData data){
@@ -74,6 +90,14 @@ public class GraphActivity extends Activity implements NetworkManagerListener {
     public void measurementDataSent(){
         // CALLBACK FROM NETWORK MANAGER WHEN DATA IS SENT
         System.out.println("SEND CALLBACK FIRE");
+    }
+
+    public void exerciseDataReceived(ExerciseData data){
+        System.out.println("RECEIVED EXERCISES:"+data.exercises());
+    }
+
+    public void exerciseDataSent(){
+        System.out.println("EXERCISES SENT!");
     }
 
 

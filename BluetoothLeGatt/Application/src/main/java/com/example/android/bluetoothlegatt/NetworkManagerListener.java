@@ -7,4 +7,8 @@ public interface NetworkManagerListener {
 
     public void measurementDataReceived(MeasurementData data);
     public void measurementDataSent();
+
+
+    public void exerciseDataReceived(ExerciseData data);
+    public void exerciseDataSent();
 }

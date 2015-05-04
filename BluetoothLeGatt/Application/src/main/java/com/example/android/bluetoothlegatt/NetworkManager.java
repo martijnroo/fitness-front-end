@@ -33,7 +33,7 @@ public class NetworkManager {
     private NetworkManager() {
 
         restAdapter = new RestAdapter.Builder()
-                .setLogLevel(RestAdapter.LogLevel.BASIC)
+                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setEndpoint("http://52.16.112.21/")
                 .build();
 
@@ -60,6 +60,26 @@ public class NetworkManager {
         });
     }
 
+    public void sendExercisesData(List<Exercise> exercises) {
+
+        HashMap<String,List<Exercise>> finalJson = new HashMap<>();
+        finalJson.put("exercises", exercises);
+
+        msrApi.pushExercises(finalJson, new Callback<Response>() {
+            @Override
+            public void success(Response response, Response response2) {
+                System.out.println("Exercises Send! response:" + response.getBody());
+
+                _fireExerciseSentEvent();
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                System.out.println("Measurements Send FAIL:" + retrofitError);
+            }
+        });
+    }
+
     private Measurement[] convertJSONToMeasurements(JsonElement jsonElement) {
         JsonArray ar = jsonElement.getAsJsonObject().getAsJsonArray("measurements");
         Measurement[] result = new Measurement[ar.size()];
@@ -72,15 +92,75 @@ public class NetworkManager {
                 JsonObject msr = ar.get(i).getAsJsonObject();
 
                 result[i] = new Measurement();
-                //result[i].id = msr.get("id").getAsInt();
-                result[i].rr_value = msr.get("rr_value").getAsInt();
-                result[i].timestamp = formatter.parse(msr.get("timestamp").getAsString());
-                result[i].user_id = msr.get("user_id").getAsInt();
+
+                JsonElement el = null;
+
+                el = msr.get("id");
+                if (el != null)
+                    result[i].id = el.getAsString();
+
+                el = msr.get("rr_value");
+                if (el != null)
+                    result[i].rr_value = el.getAsInt();
+
+                el = msr.get("timestamp");
+                if (el != null)
+                    result[i].timestamp = formatter.parse(el.getAsString());
+
+                el = msr.get("user_id");
+                if (el != null)
+                    result[i].user_id = el.getAsInt();
             }
 
             return result;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("JSON TO MEASUREMENT CONVERSION ERROR:"+e.getMessage());
+            return null;
+        }
+    }
+
+    private Exercise[] convertJSONToExercises(JsonElement jsonElement) {
+        JsonArray ar = jsonElement.getAsJsonObject().getAsJsonArray("exercises");
+        Exercise[] result = new Exercise[ar.size()];
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+
+        try {
+            for (int i = 0; i < result.length; i++) {
+
+                JsonObject msr = ar.get(i).getAsJsonObject();
+
+                result[i] = new Exercise();
+                JsonElement el = null;
+
+                el = msr.get("id");
+                if (el != null)
+                    result[i].id = el.getAsString();
+
+                el = msr.get("type");
+                if (el != null)
+                    result[i].type = el.getAsString();
+
+                el = msr.get("avg_rr_value");
+                if (el != null)
+                    result[i].avg_rr_value = el.getAsString();
+
+                el = msr.get("start");
+                if (el != null)
+                    result[i].start = formatter.parse(el.getAsString());
+
+                el = msr.get("end");
+                if (el != null)
+                    result[i].end = formatter.parse(el.getAsString());
+
+                el = msr.get("user_id");
+                if (el != null)
+                    result[i].user_id = el.getAsInt();
+            }
+
+            return result;
+        } catch (Exception e) {
+            System.out.println("JSON TO EXERCISE CONVERSION ERROR:"+e.getMessage());
             return null;
         }
     }
@@ -108,6 +188,29 @@ public class NetworkManager {
         });
     }
 
+    /*
+     *  Returns measurements from the server
+     *  See https://martijnroo.github.io/fitness-back-end/ for possible parameters
+     */
+    public void getExercises(HashMap<String,String> params) {
+
+        msrApi.exercises(params, new Callback<JsonElement>() {
+            @Override
+            public void success(JsonElement jsonElement, Response response) {
+
+                Exercise[] msr = convertJSONToExercises(jsonElement);
+
+                _fireExerciseEvent(msr);
+
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                System.out.println("FAIL" + retrofitError);
+            }
+        });
+    }
+
     public synchronized void addNetworkListener( NetworkManagerListener l ) {
         _listeners.add( l );
     }
@@ -124,10 +227,25 @@ public class NetworkManager {
         }
     }
 
-    private synchronized void _fireMeasureSentEvent () {
+    private synchronized void _fireExerciseEvent (Exercise[] exercises) {
+        ExerciseData mood = new ExerciseData( this, exercises );
         Iterator listeners = _listeners.iterator();
         while( listeners.hasNext() ) {
-            ( (NetworkManagerListener) listeners.next() ).measurementDataSent();
+            ( (NetworkManagerListener) listeners.next() ).exerciseDataReceived(mood);
+        }
+    }
+
+    private synchronized void _fireMeasureSentEvent () {
+        Iterator listeners = _listeners.iterator();
+        while (listeners.hasNext()) {
+            ((NetworkManagerListener) listeners.next()).measurementDataSent();
+        }
+    }
+
+    private synchronized void _fireExerciseSentEvent () {
+        Iterator listeners = _listeners.iterator();
+        while( listeners.hasNext() ) {
+            ( (NetworkManagerListener) listeners.next() ).exerciseDataSent();
         }
     }
 

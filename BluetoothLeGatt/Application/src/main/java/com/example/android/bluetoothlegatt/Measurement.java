@@ -8,7 +8,7 @@ import java.util.Date;
 public class Measurement {
 
     public int rr_value;
-    //public int id;
+    public String id;
     public Date timestamp;
     public int user_id;
 }
