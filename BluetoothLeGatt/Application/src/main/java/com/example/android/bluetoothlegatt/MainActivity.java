@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -47,6 +48,15 @@ public class MainActivity extends Activity {
         }
 
         ListView lv = (ListView) findViewById(R.id.exercise_list);
+
+        HashMap<String, String> query = new HashMap<>();
+        //query.put("user_id","9");
+
+        MainListener listener = new MainListener();
+        NetworkManager.getInstance().addNetworkListener(listener);
+
+        // TODO: Roman, fetch the exercises and update the ArrayAdapter below with the content in the callback!
+        NetworkManager.getInstance().getMeasurements(query);
 
         // A dummy list
         List<String> your_array_list = new ArrayList<String>();
@@ -87,6 +97,25 @@ public class MainActivity extends Activity {
         });
 
     }
+
+    public class MainListener implements NetworkManagerListener {
+        @Override
+        public void measurementDataReceived(MeasurementData data){
+            // TODO: update the exercise list form the data fetched from the server
+            // (arrayAdapter)
+            Log.v("CALLBACK:", "DATA RECEIVED!");
+            for (Measurement m : data.measurements()) {
+                //Log.v("FROM THE SERVER: ", String.valueOf(m.rr_value));
+            }
+        }
+
+        @Override
+        public void measurementDataSent() {
+            Log.d("CALLBACK:", "DATA SENT!");
+        }
+    }
+
+
 
 
     @Override

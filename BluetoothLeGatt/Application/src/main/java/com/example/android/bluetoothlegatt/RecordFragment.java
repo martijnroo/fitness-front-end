@@ -19,6 +19,12 @@ import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -101,8 +107,44 @@ public class RecordFragment extends Fragment {
                     button.setIcon(R.drawable.ic_action_new);
 
                     timer.stop();
+                    // TODO: stop measuring the RR here!
 
+                    long elapsed = SystemClock.elapsedRealtime() - timer.getBase();
+                    long endTime = System.currentTimeMillis();
+                    long startTime = endTime - elapsed;
+
+                    // Format the strings according to the backend API specification
+                    DateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+                    String formattedStart = formatter.format(new Date(startTime));
+                    String formattedEnd = formatter.format(new Date(endTime));
+
+                    // Create an intent, and send the data to ExerciseFormActivity
                     Intent intent = new Intent(getActivity(), ExerciseFormActivity.class);
+                    intent.putExtra("timer_start", formattedStart);
+                    intent.putExtra("timer_end", formattedEnd);
+
+                    // TODO: Alex, send the list of recordings to the server here
+                    // replace this with the recorded measurements
+                    // NOTE: the measurement time needs to be saved and sent to the server somehow!
+
+                    /*
+                    ArrayList<Integer> rr_list = new ArrayList<Integer>();
+                    rr_list.add(0);
+                    rr_list.add(1);
+                    rr_list.add(2);
+
+                    ArrayList<Measurement> msr = new ArrayList<>(); // a list of measurement objects
+                    for(int rr : rr_list) {
+                        Measurement mObj = new Measurement();
+                        mObj.user_id = 9;
+                        mObj.rr_value = rr;
+                        //mObj.timestamp = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+                        msr.add(mObj);
+                    }
+
+                    NetworkManager.getInstance().sendMeasurementsData(msr);
+                    */
+
                     startActivity(intent);
 
                 }
@@ -113,6 +155,8 @@ public class RecordFragment extends Fragment {
                     timer.start();
 
                     infoText.setVisibility(View.GONE);
+
+                    // TODO: Alex, start measuring the RR here!
 
                 }
 

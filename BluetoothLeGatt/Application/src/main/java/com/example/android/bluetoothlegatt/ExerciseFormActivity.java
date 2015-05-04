@@ -3,12 +3,15 @@ package com.example.android.bluetoothlegatt;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.Chronometer;
+import android.widget.EditText;
 
 
 public class ExerciseFormActivity extends Activity {
@@ -24,8 +27,25 @@ public class ExerciseFormActivity extends Activity {
         final Button saveButton = (Button) findViewById(R.id.button_save_exercise);
         saveButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
                 Log.v("button", "SAVE");
                 // Click listener for Save button
+
+                String name = ((EditText) findViewById(R.id.edit_text_exercise)).getText().toString();
+                String activity = ((EditText) findViewById(R.id.edit_activity_exercise)).getText().toString();
+                String notes = ((EditText) findViewById(R.id.edit_notes_exercise)).getText().toString();
+
+                // Timer start and end times in the format required by the server
+                String startTime = getIntent().getExtras().getString("timer_start");
+                String endTime = getIntent().getExtras().getString("timer_end");
+
+                Log.v("ExerciseFormActivity.java - start", startTime);
+                Log.v("ExerciseFormActivity.java - end", endTime);
+                Log.v("ExerciseFormActivity.java - name", name);
+
+                // TODO: Alex, Roman, Send the exercise data to the server /exercises/
+                // send the name, activity, notes, startTime and endTime + a list of exercises
+
                 Intent intent = new Intent(getApplication(), MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);    // don't add it on top of the stack!
                 startActivity(intent);
@@ -37,6 +57,7 @@ public class ExerciseFormActivity extends Activity {
             public void onClick(View v) {
                 // Click listener for Cancel button
                 Log.v("button", "CANCEL");
+
                 onBackPressed();
                 // or finish();
             }

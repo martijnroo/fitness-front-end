@@ -23,9 +23,24 @@ public class ExerciseDetailActivity extends Activity {
 
         int position = getIntent().getExtras().getInt("pos");
 
+        // TODO: Roman, fetch the exercise details from the server and update the following fields
         TextView title = (TextView) findViewById(R.id.detail_exercise_title);
-        title.setText("Exercise " + position);
+        TextView time = (TextView) findViewById(R.id.detail_exercise_time);
+        TextView name = (TextView) findViewById(R.id.detail_exercise_name);
+        TextView activity = (TextView) findViewById(R.id.detail_exercise_activity);
+        TextView notes = (TextView) findViewById(R.id.detail_exercise_notes);
 
+        title.setText("Exercise " + position);
+        // time.setText(...);
+
+        // Create a new Graph Fragment to be placed in the top part of Exercise
+        GraphFragment graph = new GraphFragment();
+
+        // TODO: Roman, fetch the measurement data by clicked listposition (in MainActivity) and update the graph data in fragment here!
+        //graph.setArguments(getIntent().getExtras());
+
+        getFragmentManager().beginTransaction()
+                .add(R.id.view_detail_top, graph).commit();
 
     }
 

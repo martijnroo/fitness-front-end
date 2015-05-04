@@ -17,7 +17,8 @@
             android:id="@+id/view_detail_top"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:orientation="vertical">
         </LinearLayout>
 
         <View
@@ -86,14 +87,14 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="Name"
-                        android:id="@+id/textView2" />
+                        android:id="@+id/detail_exercise_name_label" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="John Doe"
-                        android:id="@+id/textView3" />
+                        android:id="@+id/detail_exercise_name" />
                 </TableRow>
 
                 <TableRow
