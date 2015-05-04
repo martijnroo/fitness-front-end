@@ -131,23 +131,6 @@ public class BluetoothLeService extends Service {
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
-        // This is special handling for the Heart Rate Measurement profile.  Data parsing is
-        // carried out as per profile specifications:
-        // http://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml
-        /**
-         int flag = characteristic.getProperties();
-         int format = -1;
-         if ((flag & 0x01) != 0) {
-         format = BluetoothGattCharacteristic.FORMAT_UINT16;
-         Log.d(TAG, "Heart rate format UINT16.");
-         } else {
-         format = BluetoothGattCharacteristic.FORMAT_UINT8;
-         Log.d(TAG, "Heart rate format UINT8.");
-         }
-         final int heartRate = characteristic.getIntValue(format, 1);
-         Log.d(TAG, String.format("Received heart rate: %d", heartRate));
-         intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
-        */
         int flag = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
         int format = -1;
         Integer rr_interval;
@@ -155,18 +138,6 @@ public class BluetoothLeService extends Service {
         Time time = new Time();
         String time_stamp = null;
 
-        //ArrayList<Integer> intervals = new ArrayList<Integer>();
-        //Map<String, ArrayList<Integer>> measurements = new HashMap<String, ArrayList<Integer>>();
-
-        /**
-        if ((flag & 0x01) != 0) {
-            format = BluetoothGattCharacteristic.FORMAT_UINT16;
-           // Log.d(TAG, "Heart rate format UINT16.");
-        } else {
-            format = BluetoothGattCharacteristic.FORMAT_UINT8;
-           // Log.d(TAG, "Heart rate format UINT8.");
-        }
-        */
 
         if ((flag & 0x10) != 0){
             format = BluetoothGattCharacteristic.FORMAT_UINT16;
@@ -175,9 +146,10 @@ public class BluetoothLeService extends Service {
                 rr_interval = characteristic.getIntValue(format,i);
 
                 time.setToNow();
+                time.format2445();
                 time_stamp = time.toString();
+                Log.d(TAG, String.format("time: %s",time_stamp));
 
-                //if(rr_interval != null) Log.d(TAG, String.format("RR interval[%d]: %d at time: %s", i, rr_interval, time_stamp));
 
                 if (rr_interval != null) {
                     intent.putExtra(EXTRA_DATA, rr_interval.toString());
@@ -193,37 +165,6 @@ public class BluetoothLeService extends Service {
 
                 sendBroadcast(intent);
             }
-/**
-            Set keys = measurements.keySet();
-            Iterator i;
-
-            for(i = keys.iterator(); i.hasNext();){
-                String key = (String) i.next();
-                //Log.d(TAG, String.format("Measurement %s has values:", key));
-                intervals = measurements.get(key);
-                for(int j=0; j < intervals.size();j++){
-                   // Log.d(TAG, String.format("%d", intervals.get(j)));
-                }
-            }
-
-*/
-
-            /**
-            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2);
-            Log.d(TAG, String.format("Received RR interval 0: %d", rr_interval));
-
-            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 4);
-            Log.d(TAG, String.format("Received RR interval 1: %d", rr_interval));
-
-            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 6);
-            Log.d(TAG, String.format("Received RR interval 2: %d", rr_interval));
-
-            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 8);
-            Log.d(TAG, String.format("Received RR interval 3: %d", rr_interval));
-
-            rr_interval = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 10);
-            Log.d(TAG, String.format("Received RR interval 4: %d", rr_interval));
-*/
 
         }
 
