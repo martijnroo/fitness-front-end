@@ -1,5 +1,7 @@
 package com.example.android.bluetoothlegatt;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -15,6 +17,7 @@ import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.converter.GsonConverter;
 
 /**
  * Created by romanfilippov on 24.04.15.
@@ -24,8 +27,9 @@ public class NetworkManager {
 
     private List _listeners = new ArrayList();
 
-    RestAdapter restAdapter;
-    MeasurementsAPI msrApi;
+    private RestAdapter restAdapter;
+    private MeasurementsAPI msrApi;
+    private Gson gson;
 
     private static NetworkManager ourInstance = new NetworkManager();
     public static NetworkManager getInstance() {
@@ -33,9 +37,12 @@ public class NetworkManager {
     }
     private NetworkManager() {
 
+        gson = new GsonBuilder().setDateFormat("yyyyMMddHHmmssSSS").create();
+
         restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setEndpoint("http://52.16.112.21/")
+                .setConverter(new GsonConverter(gson))
                 .build();
 
         msrApi = restAdapter.create(MeasurementsAPI.class);

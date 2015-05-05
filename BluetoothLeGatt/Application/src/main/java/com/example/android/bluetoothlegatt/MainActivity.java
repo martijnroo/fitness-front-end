@@ -32,6 +32,7 @@ public class MainActivity extends Activity {
     private List<String> your_array_list;
     BluetoothAdapter btAdapter;
     BluetoothManager btManager;
+    private ArrayAdapter<String> arrayAdapter;
     private final static String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1;
 
@@ -68,15 +69,12 @@ public class MainActivity extends Activity {
         HashMap<String, String> query = new HashMap<>();
         query.put("user_id","0");
 
-        MainListener listener = new MainListener();
-        NetworkManager.getInstance().addNetworkListener(listener);
-        NetworkManager.getInstance().getExercises(query);
-
         your_array_list = new ArrayList<String>();
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+        arrayAdapter = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
                 your_array_list );
+
 
         lv.setAdapter(arrayAdapter);
 
@@ -99,17 +97,21 @@ public class MainActivity extends Activity {
             }
         });
 
-        if (!initialize())
-            Log.e(TAG, "Unable to initialize Bluetooth");
+        MainListener listener = new MainListener();
+        NetworkManager.getInstance().addNetworkListener(listener);
+        NetworkManager.getInstance().getExercises(query);
 
-        if (!btAdapter.isEnabled()) {
-            if (!btAdapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            }
-        }
-
-        connect();
+//        if (!initialize())
+//            Log.e(TAG, "Unable to initialize Bluetooth");
+//
+//        if (!btAdapter.isEnabled()) {
+//            if (!btAdapter.isEnabled()) {
+//                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+//            }
+//        }
+//
+//        connect();
 
     }
 
@@ -137,6 +139,9 @@ public class MainActivity extends Activity {
                 i++;
 
             }
+
+            if (i > 0)
+                arrayAdapter.notifyDataSetChanged();
 
         }
         public void exerciseDataSent(){ Log.d("CALLBACK:", "DATA SENT!"); }
