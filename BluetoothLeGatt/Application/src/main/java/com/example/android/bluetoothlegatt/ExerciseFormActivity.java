@@ -11,6 +11,8 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.text.SimpleDateFormat;
+
 
 public class ExerciseFormActivity extends Activity {
 
@@ -43,6 +45,21 @@ public class ExerciseFormActivity extends Activity {
 
                 // TODO: Alex, Roman, Send the exercise data to the server /exercises/
                 // send the name, activity, notes, startTime and endTime + a list of exercises
+
+                try {
+
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+                    Exercise ex = new Exercise();
+                    ex.start = formatter.parse(startTime);
+                    ex.end = formatter.parse(endTime);
+                    ex.user_id = 7;
+                    ex.type = activity;
+
+                    NetworkManager.getInstance().sendExerciseData(ex);
+
+                } catch (Exception exc) {
+                    System.out.println(exc.getMessage());
+                }
 
                 Intent intent = new Intent(getApplication(), MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);    // don't add it on top of the stack!

@@ -7,8 +7,13 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.widget.TextView;
 
+import java.util.Collections;
+import java.util.HashMap;
 
-public class ExerciseDetailActivity extends Activity {
+
+public class ExerciseDetailActivity extends Activity implements NetworkManagerListener {
+
+    private GraphFragment graph;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,13 +35,49 @@ public class ExerciseDetailActivity extends Activity {
         // time.setText(...);
 
         // Create a new Graph Fragment to be placed in the top part of Exercise
-        GraphFragment graph = new GraphFragment();
+        graph = new GraphFragment();
 
         // TODO: Roman, fetch the measurement data by clicked listposition (in MainActivity) and update the graph data in fragment here!
         //graph.setArguments(getIntent().getExtras());
 
+        StringBuilder sb = new StringBuilder();
+        sb.append("");
+        sb.append(position);
+        String strI = sb.toString();
+
+        HashMap<String, String> query = new HashMap<>();
+        query.put("exercise_id", strI);
+        query.put("user_id", "7");
+
+        // USE NETWORK MANAGET TO GET THE DATA
+        // THEN USE CALLBACK BELOW
+
+        NetworkManager.getInstance().addNetworkListener(this);
+        NetworkManager.getInstance().getMeasurements(query);
+
         getFragmentManager().beginTransaction()
                 .add(R.id.view_detail_top, graph).commit();
+
+    }
+
+    public void measurementDataReceived(MeasurementData data){
+        Measurement[] msr = data.measurements();
+
+        System.out.println("MSR RECEIVED. START CONFIGURING GRAPH");
+
+        graph.setGraphData(msr);
+    }
+
+    public void measurementDataSent(){
+
+    }
+
+
+    public void exerciseDataReceived(ExerciseData data){
+
+    }
+
+    public void exerciseDataSent(){
 
     }
 

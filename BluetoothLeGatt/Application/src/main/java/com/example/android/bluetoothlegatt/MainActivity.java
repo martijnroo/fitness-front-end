@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
         ListView lv = (ListView) findViewById(R.id.exercise_list);
 
         HashMap<String, String> query = new HashMap<>();
-        query.put("user_id","0");
+        query.put("user_id","7");
 
         your_array_list = new ArrayList<String>();
         arrayAdapter = new ArrayAdapter<String>(
@@ -101,17 +101,17 @@ public class MainActivity extends Activity {
         NetworkManager.getInstance().addNetworkListener(listener);
         NetworkManager.getInstance().getExercises(query);
 
-//        if (!initialize())
-//            Log.e(TAG, "Unable to initialize Bluetooth");
-//
-//        if (!btAdapter.isEnabled()) {
-//            if (!btAdapter.isEnabled()) {
-//                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-//            }
-//        }
-//
-//        connect();
+        if (!initialize())
+            Log.e(TAG, "Unable to initialize Bluetooth");
+
+        if (!btAdapter.isEnabled()) {
+            if (!btAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            }
+        }
+
+        connect();
 
     }
 
