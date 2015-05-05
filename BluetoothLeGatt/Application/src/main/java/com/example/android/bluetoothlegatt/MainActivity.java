@@ -7,7 +7,10 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,9 +25,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 
 public class MainActivity extends Activity {
@@ -37,6 +48,11 @@ public class MainActivity extends Activity {
 
     private BluetoothGatt bGatt;
     private String address = "00:22:D0:61:03:86";
+
+    private Map<String, ArrayList<Integer>> measurements = new HashMap<String, ArrayList<Integer>>();
+
+    public final static UUID UUID_HEART_RATE_MEASUREMENT =
+            UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
 
 
 
@@ -110,6 +126,7 @@ public class MainActivity extends Activity {
         }
 
         connect();
+
 
     }
 
@@ -205,26 +222,105 @@ public class MainActivity extends Activity {
             Log.w(TAG, "Device not found.  Unable to connect.");
             return false;
         }
-        bGatt = device.connectGatt(this, true, gattCallback);
+        bGatt = device.connectGatt(this, false, gattCallback);
         Log.d(TAG, String.format("Name: %s", device.getName()));
+        //bGatt.discoverServices();
         return true;
     }
 
     private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
 
+
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            String intentAction;
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+                Log.i(TAG, "Connected to GATT server.");
+                // Attempts to discover services after successful connection.
+                Log.i(TAG, "Attempting to start service discovery:" +
+                        bGatt.discoverServices());
+
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                Log.i(TAG, "Disconnected from GATT server.");
+            }
+        }
+
+
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
             // this will get called anytime you perform a read or write characteristic operation
-        }
 
-        @Override
-        public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
-            // this will get called when a device connects or disconnects
+            Log.w(TAG, "Characteristic change.");
+            int flag = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+            int format = -1;
+            Integer rr_interval;
+            rr_interval = 0;
+            long time;
+            String time_stamp = null;
+            DateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+
+
+            if ((flag & 0x10) != 0){
+                format = BluetoothGattCharacteristic.FORMAT_UINT16;
+
+                for(int i=2; i<=10; i+=2){
+                    rr_interval = characteristic.getIntValue(format,i);
+                    if (rr_interval != null) {
+
+                        time = System.currentTimeMillis();
+                        time_stamp = formatter.format(new Date(time));
+                        // Log.d(TAG, String.format("time: %s", time_stamp));
+
+
+                        /**if (rr_interval != null) {
+                         intent.putExtra(EXTRA_DATA, rr_interval.toString());
+                         }*/
+
+                        if (!measurements.containsKey(time_stamp)) {
+                            measurements.put(time_stamp, new ArrayList<Integer>());
+                            if (rr_interval != null) measurements.get(time_stamp).add(rr_interval);
+                        } else {
+                            if (rr_interval != null) measurements.get(time_stamp).add(rr_interval);
+                        }
+                    }
+                   // sendBroadcast(intent);
+                }
+
+            }
+
+            JSONObject json = new JSONObject(measurements);
+            try {
+                Log.d(TAG, String.format("Measurements: %s", json.toString(1)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void onServicesDiscovered(final BluetoothGatt gatt, final int status) {
-            // this will get called after the client initiates a            BluetoothGatt.discoverServices() call
+            // called when use discoverServices
+
+            List<BluetoothGattService> services = bGatt.getServices();
+
+            //A GATT operation completed successfully
+            //Constant Value: 0 (0x00000000)
+            Log.w(TAG, "onServicesDiscovered received: " + status);
+
+            for (BluetoothGattService service : services) {
+                List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
+
+                    for (BluetoothGattCharacteristic characteristic : characteristics){
+                        Log.w(TAG,"characteristic: "+characteristic.getUuid());
+                        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
+                            bGatt.setCharacteristicNotification(characteristic, true);
+                            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
+                                    UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
+                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                            bGatt.writeDescriptor(descriptor);
+                        }
+                    }
+            }
+
         }
     };
 

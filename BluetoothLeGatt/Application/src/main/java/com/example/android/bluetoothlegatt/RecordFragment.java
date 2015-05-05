@@ -29,7 +29,7 @@ import java.util.Date;
  * Use the {@link RecordFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RecordFragment extends Fragment {
+public class RecordFragment extends Fragment{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -158,6 +158,7 @@ public class RecordFragment extends Fragment {
                     infoText.setVisibility(View.GONE);
 
                     // TODO: Alex, start measuring the RR here!
+
 
                 }
 
