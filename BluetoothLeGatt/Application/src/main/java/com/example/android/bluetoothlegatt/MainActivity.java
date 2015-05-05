@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
         ListView lv = (ListView) findViewById(R.id.exercise_list);
 
         HashMap<String, String> query = new HashMap<>();
-        query.put("user_id","9");
+        query.put("user_id","0");
 
         MainListener listener = new MainListener();
         NetworkManager.getInstance().addNetworkListener(listener);

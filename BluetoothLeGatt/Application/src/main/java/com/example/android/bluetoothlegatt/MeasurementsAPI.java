@@ -28,5 +28,5 @@ public interface MeasurementsAPI {
     public void exercises(@QueryMap Map<String, String> options, Callback<JsonElement> cb);
 
     @POST("/exercises/")
-    public void pushExercises(@Body HashMap<String,List<Exercise>> exercises, Callback<Response> cb);
+    public void pushExercise(@Body Exercise exercise, Callback<Response> cb);
 }

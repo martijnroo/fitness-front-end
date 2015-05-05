@@ -2,6 +2,7 @@ package com.example.android.bluetoothlegatt;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 import java.text.SimpleDateFormat;
@@ -60,12 +61,9 @@ public class NetworkManager {
         });
     }
 
-    public void sendExercisesData(List<Exercise> exercises) {
+    public void sendExerciseData(Exercise exercise) {
 
-        HashMap<String,List<Exercise>> finalJson = new HashMap<>();
-        finalJson.put("exercises", exercises);
-
-        msrApi.pushExercises(finalJson, new Callback<Response>() {
+        msrApi.pushExercise(exercise, new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 System.out.println("Exercises Send! response:" + response.getBody());
@@ -134,27 +132,27 @@ public class NetworkManager {
                 JsonElement el = null;
 
                 el = msr.get("id");
-                if (el != null)
+                if (el != null && !el.isJsonNull())
                     result[i].id = el.getAsString();
 
                 el = msr.get("type");
-                if (el != null)
+                if (el != null && !el.isJsonNull())
                     result[i].type = el.getAsString();
 
                 el = msr.get("avg_rr_value");
-                if (el != null)
+                if (el != null && !el.isJsonNull())
                     result[i].avg_rr_value = el.getAsString();
 
                 el = msr.get("start");
-                if (el != null)
+                if (el != null && !el.isJsonNull())
                     result[i].start = formatter.parse(el.getAsString());
 
                 el = msr.get("end");
-                if (el != null)
+                if (el != null && !el.isJsonNull())
                     result[i].end = formatter.parse(el.getAsString());
 
                 el = msr.get("user_id");
-                if (el != null)
+                if (el != null && !el.isJsonNull())
                     result[i].user_id = el.getAsInt();
             }
 

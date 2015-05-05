@@ -9,6 +9,7 @@ import com.android.volley.RequestQueue;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -52,21 +53,19 @@ public class GraphActivity extends Activity implements NetworkManagerListener {
 //
 //        NetworkManager.getInstance().getMeasurements(query);
 //
-//        Exercise e1 = new Exercise();
-//        e1.type = "walking";
-//        e1.user_id = 9;
-//        e1.start = new Date();
-//        e1.end = new Date();
-//
-//        ArrayList<Exercise> exr = new ArrayList<>();
-//        exr.add(e1);
-//
-//        NetworkManager.getInstance().sendExercisesData(exr);
+        Exercise e1 = new Exercise();
+        e1.type = "walking";
+        e1.user_id = 99;
+        e1.start = new Date();
+        e1.end = new Date();
 
-        HashMap<String, String> exr_query = new HashMap<>();
-        exr_query.put("user_id","4");
 
-        NetworkManager.getInstance().getExercises(exr_query);
+        NetworkManager.getInstance().sendExerciseData(e1);
+
+//        HashMap<String, String> exr_query = new HashMap<>();
+//        exr_query.put("user_id","4");
+//
+//        NetworkManager.getInstance().getExercises(exr_query);
     }
 
     public void measurementDataReceived(MeasurementData data){
