@@ -13,6 +13,9 @@ import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -39,24 +42,35 @@ public class GraphFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public void setGraphData(HashMap<String,Object> data) {
+//    public class customComparator extends Comparator {
+//        public boolean compare(Object object1, Object object2) {
+//            return ((Measurement)object1).timestamp.compareTo(((Measurement)object2).timestamp)>0;
+//        }
+//    }
 
-        double[] msr = (double[])data.get("measurements");
-        Date[] dates = (Date[])data.get("timestamps");
+    public void setGraphData(Measurement[] msr) {
 
-        double min = msr[0];
+        //double[] m = new double[msr.length];
+//        Date[] dates = (Date[])data.get("timestamps");
+
+        if (msr.length == 0)
+            return;
+
+        Arrays.sort(msr);
+
+        double min = msr[0].rr_value;
         double max = min;
 
         DataPoint[] dp = new DataPoint[msr.length];
         for (int i = 0; i < msr.length; i++) {
 
-            if (msr[i] < min)
-                min = msr[i];
+            if (msr[i].rr_value < min)
+                min = msr[i].rr_value;
 
-            if (msr[i] > max)
-                max = msr[i];
+            if (msr[i].rr_value > max)
+                max = msr[i].rr_value;
 
-            dp[i] = new DataPoint(dates[i], msr[i]);
+            dp[i] = new DataPoint(msr[i].timestamp, msr[i].rr_value);
         }
 
         mSeries.resetData(dp);
@@ -79,8 +93,8 @@ public class GraphFragment extends Fragment {
         graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
 
 // set manual x bounds to have nice steps
-        graph.getViewport().setMinX(dates[0].getTime());
-        graph.getViewport().setMaxX(dates[dates.length - 1].getTime());
+        graph.getViewport().setMinX(msr[0].timestamp.getTime());
+        graph.getViewport().setMaxX(msr[msr.length - 1].timestamp.getTime());
 
         System.out.println("New data set!");
     }

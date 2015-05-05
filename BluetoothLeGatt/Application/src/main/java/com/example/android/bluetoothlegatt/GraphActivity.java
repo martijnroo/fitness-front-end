@@ -53,14 +53,14 @@ public class GraphActivity extends Activity implements NetworkManagerListener {
 //
 //        NetworkManager.getInstance().getMeasurements(query);
 //
-        Exercise e1 = new Exercise();
-        e1.type = "walking";
-        e1.user_id = 99;
-        e1.start = new Date();
-        e1.end = new Date();
-
-
-        NetworkManager.getInstance().sendExerciseData(e1);
+//        Exercise e1 = new Exercise();
+//        e1.type = "walking";
+//        e1.user_id = 99;
+//        e1.start = new Date();
+//        e1.end = new Date();
+//
+//
+//        NetworkManager.getInstance().sendExerciseData(e1);
 
 //        HashMap<String, String> exr_query = new HashMap<>();
 //        exr_query.put("user_id","4");
