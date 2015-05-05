@@ -1,8 +1,14 @@
 package com.example.android.bluetoothlegatt;
 
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,6 +30,15 @@ import java.util.List;
 public class MainActivity extends Activity {
 
     private List<String> your_array_list;
+    BluetoothAdapter btAdapter;
+    BluetoothManager btManager;
+    private final static String TAG = MainActivity.class.getSimpleName();
+    private static final int REQUEST_ENABLE_BT = 1;
+
+    private BluetoothGatt bGatt;
+    private String address = "00:22:D0:61:03:86";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +66,7 @@ public class MainActivity extends Activity {
         ListView lv = (ListView) findViewById(R.id.exercise_list);
 
         HashMap<String, String> query = new HashMap<>();
-        //query.put("user_id","9");
+        query.put("user_id","9");
 
         MainListener listener = new MainListener();
         NetworkManager.getInstance().addNetworkListener(listener);
@@ -84,6 +98,18 @@ public class MainActivity extends Activity {
 
             }
         });
+
+        if (!initialize())
+            Log.e(TAG, "Unable to initialize Bluetooth");
+
+        if (!btAdapter.isEnabled()) {
+            if (!btAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            }
+        }
+
+        connect();
 
     }
 
@@ -153,4 +179,55 @@ public class MainActivity extends Activity {
             return rootView;
         }
     }
+
+
+    public boolean initialize() {
+        if (btManager == null) {
+            btManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+            if (btManager == null) {
+                Log.e(TAG, "Unable to initialize BluetoothManager.");
+                return false;
+            }
+        }
+
+        btAdapter = btManager.getAdapter();
+        if (btAdapter == null) {
+            Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean connect(){
+        BluetoothDevice device = btAdapter.getRemoteDevice(address);
+        if (device == null) {
+            Log.w(TAG, "Device not found.  Unable to connect.");
+            return false;
+        }
+        bGatt = device.connectGatt(this, true, gattCallback);
+        Log.d(TAG, String.format("Name: %s", device.getName()));
+        return true;
+    }
+
+    private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
+            // this will get called anytime you perform a read or write characteristic operation
+        }
+
+        @Override
+        public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
+            // this will get called when a device connects or disconnects
+        }
+
+        @Override
+        public void onServicesDiscovered(final BluetoothGatt gatt, final int status) {
+            // this will get called after the client initiates a            BluetoothGatt.discoverServices() call
+        }
+    };
+
+
+
 }

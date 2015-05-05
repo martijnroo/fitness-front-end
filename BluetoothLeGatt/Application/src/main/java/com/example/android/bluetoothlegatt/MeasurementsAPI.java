@@ -1,6 +1,5 @@
 package com.example.android.bluetoothlegatt;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import java.util.HashMap;
@@ -10,8 +9,6 @@ import java.util.Map;
 import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.http.Body;
-import retrofit.http.Field;
-import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.QueryMap;

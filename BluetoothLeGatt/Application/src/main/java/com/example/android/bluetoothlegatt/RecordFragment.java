@@ -1,15 +1,12 @@
 package com.example.android.bluetoothlegatt;
 
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.Context;
+import android.app.Fragment;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.os.SystemClock;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,8 +18,6 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 
@@ -45,6 +40,11 @@ public class RecordFragment extends Fragment {
     private FloatingActionButton button;
     private Chronometer timer;
     private TextView infoText;
+    private final static String TAG = RecordFragment.class.getSimpleName();
+    private BluetoothManager btManager;
+    private BluetoothAdapter btAdapter;
+
+    private MainActivity mActivity;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -81,6 +81,7 @@ public class RecordFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
 
     }
 
