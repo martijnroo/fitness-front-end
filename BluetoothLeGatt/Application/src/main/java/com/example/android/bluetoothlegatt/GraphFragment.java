@@ -53,6 +53,9 @@ public class GraphFragment extends Fragment {
         //double[] m = new double[msr.length];
 //        Date[] dates = (Date[])data.get("timestamps");
 
+        if (msr.length == 0)
+            return;
+
         Arrays.sort(msr);
 
         double min = msr[0].rr_value;
