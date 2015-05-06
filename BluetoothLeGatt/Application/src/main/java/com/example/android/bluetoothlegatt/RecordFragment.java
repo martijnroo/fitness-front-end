@@ -125,6 +125,8 @@ public class RecordFragment extends Fragment{
                     intent.putExtra("timer_end", formattedEnd);
 
                     // TODO: Alex, send the list of recordings to the server here
+                    //ArrayList<Measurement> test = mActivity.getMeasurements();
+                    //mActivity.sendMeasurements(test);
                     // replace this with the recorded measurements
                     // NOTE: the measurement time needs to be saved and sent to the server somehow!
 

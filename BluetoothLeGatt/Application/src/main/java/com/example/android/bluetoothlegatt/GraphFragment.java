@@ -4,20 +4,21 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 
 
 /**
@@ -41,6 +42,7 @@ public class GraphFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private final static String TAG = GraphFragment.class.getSimpleName();
 
 //    public class customComparator extends Comparator {
 //        public boolean compare(Object object1, Object object2) {
@@ -71,30 +73,54 @@ public class GraphFragment extends Fragment {
                 max = msr[i].rr_value;
 
             dp[i] = new DataPoint(msr[i].timestamp, msr[i].rr_value);
+            Log.d(TAG, String.format("rr_value: %d", msr[i].rr_value));
+            System.out.println("Timestamp: " +msr[i].timestamp.getTime());
         }
 
-        mSeries.resetData(dp);
+//        Calendar calendar = Calendar.getInstance();
+//        Date d1 = calendar.getTime();
+//        calendar.add(Calendar.SECOND, 1);
+//        Date d2 = calendar.getTime();
+//        calendar.add(Calendar.SECOND, 1);
+//        Date d3 = calendar.getTime();
+//
+//        DataPoint[] ff = new DataPoint[] {
+//                new DataPoint(d1, msr[1].rr_value),
+//                new DataPoint(d2, msr[2].rr_value),
+//                new DataPoint(d3, msr[3].rr_value)
+//        };
+//
+//        mSeries.resetData(ff);
+
+
+        //Log.d(TAG, String.format("Min value: %f", min));
+        //Log.d(TAG, String.format("Max value: %f", max));
 
         View rootView = getView();
         GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
 
-        graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setXAxisBoundsManual(true);
+//        graph.getViewport().setMinX(d1.getTime());
+//        graph.getViewport().setMaxX(d3.getTime());
+//        graph.getViewport().setXAxisBoundsManual(true);
+
+        //graph.getViewport().setYAxisBoundsManual(true);
+
 
         if (min == max) {
             min -= 2;
             max += 2;
         }
-        graph.getViewport().setMinY(min);
-        graph.getViewport().setMaxY(max);
+        //graph.getViewport().setMinY(min);
+        //graph.getViewport().setMaxY(max);
 
         // set date label formatter
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
+        //graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
+        //graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
 
 // set manual x bounds to have nice steps
-        graph.getViewport().setMinX(msr[0].timestamp.getTime());
-        graph.getViewport().setMaxX(msr[msr.length - 1].timestamp.getTime());
+//        graph.getViewport().setMinX(msr[0].timestamp.getTime());
+//        graph.getViewport().setMaxX(msr[msr.length - 1].timestamp.getTime());
+//        graph.getViewport().setXAxisBoundsManual(true);
 
         System.out.println("New data set!");
     }
@@ -136,9 +162,52 @@ public class GraphFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_graph, container, false);
         GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
+        /**mSeries = new LineGraphSeries<DataPoint>(new DataPoint[] {
+        });
+        graph.addSeries(mSeries);*/
+
+        final java.text.DateFormat dateTimeFormatter = DateFormat.getTimeFormat(getActivity());
+
+
+        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+            @Override
+            public String formatLabel(double value, boolean isValueX) {
+                if (isValueX) {
+                    // show normal x values
+                    return dateTimeFormatter.format(new Date((long) value*1000));
+                } else {
+                    // show currency for y values
+                    return super.formatLabel(value, isValueX);
+                }
+            }
+        });
+
+        Calendar calendar = Calendar.getInstance();
+        Date d1 = calendar.getTime();
+        calendar.add(Calendar.SECOND, 1);
+        Date d2 = calendar.getTime();
+        calendar.add(Calendar.SECOND, 1);
+        Date d3 = calendar.getTime();
+
+
         mSeries = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                new DataPoint(d1, 1),
+                new DataPoint(d2, 5),
+                new DataPoint(d3, 3)
         });
         graph.addSeries(mSeries);
+
+// set date label formatter
+        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
+        graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
+
+// set manual x bounds to have nice steps
+        graph.getViewport().setMinX(d1.getTime());
+        graph.getViewport().setMaxX(d3.getTime());
+        graph.getViewport().setXAxisBoundsManual(true);
+
+// you can directly pass Date objects to DataPoint-Constructor
+// this will convert the Date to double via Date#getTime()
         // Inflate the layout for this fragment
         return rootView;
     }

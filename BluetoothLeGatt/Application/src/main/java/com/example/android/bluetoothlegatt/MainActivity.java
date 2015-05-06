@@ -25,9 +25,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,10 +47,14 @@ public class MainActivity extends Activity {
     private BluetoothGatt bGatt;
     private String address = "00:22:D0:61:03:86";
 
-    private Map<String, ArrayList<Integer>> measurements = new HashMap<String, ArrayList<Integer>>();
+    private Map<Date, ArrayList<Integer>> measurements = new HashMap<Date, ArrayList<Integer>>();
 
     public final static UUID UUID_HEART_RATE_MEASUREMENT =
             UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
+
+    public ArrayList<Measurement> msr = new ArrayList<>();
+    int user_id = 7;
+    private Exercise[] foundData;
 
 
 
@@ -103,9 +104,10 @@ public class MainActivity extends Activity {
                 // The data can be stored in a bundle, if required.
                 // Maybe fetch it directly from the server?
                 Bundle data = new Bundle();
-                data.putInt("pos", position);
+                data.putInt("pos", Integer.parseInt(foundData[position].id));
 
                 Intent intent = new Intent(getApplication(), ExerciseDetailActivity.class);
+
                 intent.putExtras(data);
 
                 startActivity(intent);
@@ -130,6 +132,7 @@ public class MainActivity extends Activity {
         connect();
 
 
+
     }
 
     public class MainListener implements NetworkManagerListener {
@@ -150,6 +153,7 @@ public class MainActivity extends Activity {
         public void exerciseDataReceived(ExerciseData data){
 
             int i=0;
+            foundData = data.exercises();
             for (Exercise ex : data.exercises()) {
 
                 your_array_list.add("Exercise "+i);
@@ -221,6 +225,15 @@ public class MainActivity extends Activity {
         return true;
     }
 
+    public ArrayList<Measurement> getMeasurements(){
+        return msr;
+    }
+
+    public void sendMeasurements(ArrayList<Measurement> m){
+        NetworkManager.getInstance().sendMeasurementsData(m);
+        m.clear();
+    }
+
     public boolean connect(){
         BluetoothDevice device = btAdapter.getRemoteDevice(address);
         if (device == null) {
@@ -261,44 +274,58 @@ public class MainActivity extends Activity {
             Integer rr_interval;
             rr_interval = 0;
             long time;
-            String time_stamp = null;
+            Date time_stamp = null;
             DateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
 
             if ((flag & 0x10) != 0){
                 format = BluetoothGattCharacteristic.FORMAT_UINT16;
 
+
                 for(int i=2; i<=10; i+=2){
                     rr_interval = characteristic.getIntValue(format,i);
                     if (rr_interval != null) {
 
+                        Measurement testUser = new Measurement();
+                        testUser.user_id = user_id;
+                        testUser.rr_value = rr_interval;
+                        testUser.timestamp = new Date();
+                        ArrayList<Measurement> msr = new ArrayList<Measurement>();
+                        msr.add(testUser);
+                        NetworkManager.getInstance().sendMeasurementsData(msr);
+
+
+
                         time = System.currentTimeMillis();
-                        time_stamp = formatter.format(new Date(time));
+                        //time_stamp = formatter.format(new Date(time));
+                        time_stamp = new Date();
                         // Log.d(TAG, String.format("time: %s", time_stamp));
 
 
                         /**if (rr_interval != null) {
                          intent.putExtra(EXTRA_DATA, rr_interval.toString());
                          }*/
-
+                        /**
                         if (!measurements.containsKey(time_stamp)) {
                             measurements.put(time_stamp, new ArrayList<Integer>());
                             if (rr_interval != null) measurements.get(time_stamp).add(rr_interval);
                         } else {
                             if (rr_interval != null) measurements.get(time_stamp).add(rr_interval);
                         }
+                         */
                     }
                    // sendBroadcast(intent);
+
                 }
 
             }
-
+/**
             JSONObject json = new JSONObject(measurements);
             try {
                 Log.d(TAG, String.format("Measurements: %s", json.toString(1)));
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
 
         @Override

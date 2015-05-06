@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 import java.text.SimpleDateFormat;
@@ -40,7 +39,7 @@ public class NetworkManager {
         gson = new GsonBuilder().setDateFormat("yyyyMMddHHmmssSSS").create();
 
         restAdapter = new RestAdapter.Builder()
-                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setLogLevel(RestAdapter.LogLevel.BASIC)
                 .setEndpoint("http://52.16.112.21/")
                 .setConverter(new GsonConverter(gson))
                 .build();
